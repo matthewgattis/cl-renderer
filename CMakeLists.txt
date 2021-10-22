@@ -3,6 +3,11 @@ cmake_minimum_required(VERSION 3.16.3)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR};${CMAKE_MODULE_PATH};")
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
+include(cmake/vcpkgdependencies.cmake)
+set(VCPKG_ROOT ${CMAKE_BINARY_DIR}/vcpkg)
+set(CMAKE_TOOLCHAIN_FILE ${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake)
+vcpkg_install(4474aba1e77be2d643eb684298b7d5479cad9a1f)
+
 project(cl-renderer VERSION 0.1.0)
 
 vcpkg_add_dependencies(
