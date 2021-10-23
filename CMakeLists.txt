@@ -14,6 +14,7 @@ vcpkg_add_dependencies(
     boolinq
     jsoncpp
     libpng
+    zstd
     )
 
 find_path(BOOLINQ_INCLUDE_DIRS "boolinq/boolinq.h")
@@ -25,11 +26,13 @@ find_package(zstd CONFIG REQUIRED)
 set(${PROJECT_NAME}_source
     ./main.cpp
     ./app.cpp
+    ./cldevice.cpp
     ./clplatform.cpp
     )
 
 set(${PROJECT_NAME}_include
     ./app.hpp
+    ./cldevice.hpp
     ./clplatform.hpp
     ./log.hpp
     )

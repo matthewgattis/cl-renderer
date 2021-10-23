@@ -20,7 +20,16 @@ CLPlatform::CLPlatform(
     cl_int err;
     cl_platform_id platforms[64];
     cl_uint num_platforms;
-    err = clGetPlatformIDs(64, platforms, &num_platforms);
+    err = clGetPlatformIDs(
+        64,
+        platforms,
+        &num_platforms);
+    if (err != CL_SUCCESS)
+    {
+        LOG_ERROR <<
+            "Error in clGetPlatformIDs. (" << err << ")" << std::endl;
+        throw std::exception();
+    }
 
     platform_ = boolinq::from(platforms)
         .where_i([&num_platforms](const cl_platform_id &x, int i)
@@ -32,13 +41,20 @@ CLPlatform::CLPlatform(
                 cl_int err;
                 char param_value[32767];
                 size_t  param_value_size_ret;
-                err = clGetPlatformInfo(x, CL_PLATFORM_NAME, 32767, param_value, &param_value_size_ret);
+                err = clGetPlatformInfo(
+                    x,
+                    CL_PLATFORM_NAME,
+                    32767,
+                    param_value,
+                    &param_value_size_ret);
                 if (err != CL_SUCCESS)
                 {
-                    LOG_ERROR << "Error in clGetPlatformInfo (" << err << ")." << std::endl;
+                    LOG_ERROR <<
+                        "Error in clGetPlatformInfo. (" << err << ")" << std::endl;
                     throw std::exception();
                 }
-                return std::string(param_value).compare(platform_name) == 0;
+                return std::string(param_value).compare(
+                    platform_name) == 0;
             });
 
     LOG_INFO << "Selected platform (" << platform_ << ")." << std::endl;
@@ -60,18 +76,26 @@ CLPlatform::CLPlatform(
                     cl_int err;
                     char param_value[32767];
                     size_t  param_value_size_ret;
-                    err = clGetPlatformInfo(this->platform_, x.first, 32767, param_value, &param_value_size_ret);
+                    err = clGetPlatformInfo(
+                        this->platform_,
+                        x.first,
+                        32767,
+                        param_value,
+                        &param_value_size_ret);
                     if (err != CL_SUCCESS)
                     {
-                        LOG_ERROR << "Error in clGetPlatformInfo. (" << err << ")" << std::endl;
+                        LOG_ERROR <<
+                            "Error in clGetPlatformInfo. (" << err << ")" << std::endl;
                         throw std::exception();
                     }
-                    LOG_INFO << "Platform " << x.second << ". (" << std::string(param_value) << ")" << std::endl;
+                    LOG_INFO <<
+                        "Platform " << x.second << " (" << std::string(param_value) << ")." << std::endl;
                 });
     }
     catch (const std::exception &e)
     {
-        LOG_WARNING << "Uncaught exception enumerating platform info log. (" << e.what() << ")" << std::endl;
+        LOG_WARNING <<
+            "Uncaught exception enumerating platform info log. (" << e.what() << ")" << std::endl;
     }
 }
 
