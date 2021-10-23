@@ -26,15 +26,17 @@ find_package(zstd CONFIG REQUIRED)
 set(${PROJECT_NAME}_source
     ./main.cpp
     ./app.cpp
-    ./cldevice.cpp
-    ./clplatform.cpp
+    ./openclcontext.cpp
+    ./opencldevice.cpp
+    ./openclplatform.cpp
     )
 
 set(${PROJECT_NAME}_include
     ./app.hpp
-    ./cldevice.hpp
-    ./clplatform.hpp
     ./log.hpp
+    ./openclcontext.hpp
+    ./opencldevice.hpp
+    ./openclplatform.hpp
     )
 
 add_executable(${PROJECT_NAME}

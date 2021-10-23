@@ -6,13 +6,13 @@
 #include <memory>
 #include <string>
 
-class CLPlatform;
+class OpenCLPlatform;
 
-class CLDevice
+class OpenCLDevice
 {
 public:
-    CLDevice(
-        const std::shared_ptr<CLPlatform> &platform,
+    OpenCLDevice(
+        const std::shared_ptr<OpenCLPlatform> &platform,
         const std::string &device_name);
 
     const cl_device_id &get() const;

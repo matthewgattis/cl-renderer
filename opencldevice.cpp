@@ -1,4 +1,4 @@
-#include "cldevice.hpp"
+#include "opencldevice.hpp"
 
 #include <CL/cl.h>
 #include <memory>
@@ -6,17 +6,19 @@
 #define CL_TARGET_OPENCL_VERSION 300
 #include <boolinq/boolinq.h>
 
-#include "clplatform.hpp"
+#include "openclplatform.hpp"
 
-#define LOG_MODULE_NAME ("CLDevice")
+#define LOG_MODULE_NAME ("OpenCLDevice")
 #include "log.hpp"
 
-CLDevice::CLDevice(
-    const std::shared_ptr<CLPlatform> &platform,
+OpenCLDevice::OpenCLDevice(
+    const std::shared_ptr<OpenCLPlatform> &platform,
     const std::string &device_name)
     : device_(nullptr)
 {
     LOG_INFO << "Instance created." << std::endl;
+
+    LOG_INFO << "Searching for device by name (" << device_name << ")." << std::endl;
 
     cl_int err;
     cl_device_id devices[64];
@@ -141,5 +143,10 @@ CLDevice::CLDevice(
         LOG_WARNING <<
             "Uncaught exception enumerating device info log. (" << e.what() << ")" << std::endl;
     }
+}
+
+const cl_device_id &OpenCLDevice::get() const
+{
+    return device_;
 }
 

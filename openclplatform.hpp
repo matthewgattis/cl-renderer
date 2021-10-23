@@ -5,10 +5,10 @@
 
 #include <string>
 
-class CLPlatform
+class OpenCLPlatform
 {
 public:
-    CLPlatform(const std::string &platform_name);
+    OpenCLPlatform(const std::string &platform_name);
 
     const cl_platform_id &get() const;
 

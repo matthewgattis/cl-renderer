@@ -1,4 +1,4 @@
-#include "clplatform.hpp"
+#include "openclplatform.hpp"
 
 #include <exception>
 #include <tuple>
@@ -8,10 +8,10 @@
 #include <boolinq/boolinq.h>
 #include <CL/cl.h>
 
-#define LOG_MODULE_NAME ("CLPlatform")
+#define LOG_MODULE_NAME ("OpenCLPlatform")
 #include "log.hpp"
 
-CLPlatform::CLPlatform(
+OpenCLPlatform::OpenCLPlatform(
     const std::string &platform_name)
     : platform_(nullptr)
 {
@@ -99,7 +99,7 @@ CLPlatform::CLPlatform(
     }
 }
 
-const cl_platform_id &CLPlatform::get() const
+const cl_platform_id &OpenCLPlatform::get() const
 {
     return platform_;
 }
