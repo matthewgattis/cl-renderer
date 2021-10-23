@@ -20,14 +20,17 @@ find_path(BOOLINQ_INCLUDE_DIRS "boolinq/boolinq.h")
 find_package(jsoncpp CONFIG REQUIRED)
 find_package(libpng CONFIG REQUIRED)
 find_package(OpenCL REQUIRED)
+find_package(zstd CONFIG REQUIRED)
 
 set(${PROJECT_NAME}_source
     ./main.cpp
     ./app.cpp
+    ./clplatform.cpp
     )
 
 set(${PROJECT_NAME}_include
     ./app.hpp
+    ./clplatform.hpp
     ./log.hpp
     )
 
@@ -35,6 +38,10 @@ add_executable(${PROJECT_NAME}
     ${${PROJECT_NAME}_include}
     ${${PROJECT_NAME}_source}
     )
+
+#set_property(TARGET ${PROJECT_NAME}
+#    PROPERTY CXX_STANDARD 17
+#    )
 
 target_include_directories(${PROJECT_NAME}
     PRIVATE ${OpenCL_INCLUDE_DIRS}
@@ -44,5 +51,6 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE jsoncpp_object jsoncpp_static
     PRIVATE png_static
     PRIVATE ${OpenCL_LIBRARIES}
+    PRIVATE zstd::libzstd_static
     )
 
