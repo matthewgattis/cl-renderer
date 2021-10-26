@@ -29,6 +29,7 @@ set(${PROJECT_NAME}_source
     ./openclcontext.cpp
     ./opencldevice.cpp
     ./openclplatform.cpp
+    ./openclprogram.cpp
     )
 
 set(${PROJECT_NAME}_include
@@ -37,6 +38,7 @@ set(${PROJECT_NAME}_include
     ./openclcontext.hpp
     ./opencldevice.hpp
     ./openclplatform.hpp
+    ./openclprogram.hpp
     )
 
 add_executable(${PROJECT_NAME}
