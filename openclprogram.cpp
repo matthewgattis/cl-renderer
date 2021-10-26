@@ -102,6 +102,7 @@ OpenCLProgram::~OpenCLProgram()
 {
     if (program_ != nullptr)
     {
+        // Free program.
         clReleaseProgram(program_);
         LOG_INFO << "Program released." << std::endl;
     }

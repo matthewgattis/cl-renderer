@@ -18,11 +18,11 @@ OpenCLPlatform::OpenCLPlatform(
     LOG_INFO << "Instance created." << std::endl;
 
     cl_int err;
-    cl_platform_id platforms[64];
     cl_uint num_platforms;
+    // Get number of platforms.
     err = clGetPlatformIDs(
-        64,
-        platforms,
+        0,
+        nullptr,
         &num_platforms);
     if (err != CL_SUCCESS)
     {
@@ -31,16 +31,27 @@ OpenCLPlatform::OpenCLPlatform(
         throw std::exception();
     }
 
+    std::vector<cl_platform_id> platforms(num_platforms);
+    // Get platforms.
+    err = clGetPlatformIDs(
+        num_platforms,
+        platforms.data(),
+        nullptr);
+    if (err != CL_SUCCESS)
+    {
+        LOG_ERROR <<
+            "Error in clGetPlatformIDs. (" << err << ")" << std::endl;
+        throw std::exception();
+    }
+
+    // Get first platform matching out search criteria.
     platform_ = boolinq::from(platforms)
-        .where_i([&num_platforms](const cl_platform_id &x, int i)
-            {
-                return i < num_platforms;
-            })
         .first([&platform_name](const cl_platform_id &x)
             {
                 cl_int err;
                 char param_value[32767];
                 size_t  param_value_size_ret;
+                // Get platform name.
                 err = clGetPlatformInfo(
                     x,
                     CL_PLATFORM_NAME,
@@ -70,6 +81,7 @@ OpenCLPlatform::OpenCLPlatform(
 
     try
     {
+        // Enumerate platform info.
         boolinq::from(param_names)
             .for_each([this](const std::pair<cl_platform_info, std::string> &x)
                 {
@@ -95,7 +107,7 @@ OpenCLPlatform::OpenCLPlatform(
     catch (const std::exception &e)
     {
         LOG_WARNING <<
-            "Uncaught exception enumerating platform info log. (" << e.what() << ")" << std::endl;
+            "Uncaught exception enumerating platform info. (" << e.what() << ")" << std::endl;
     }
 }
 

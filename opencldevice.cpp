@@ -2,6 +2,7 @@
 
 #include <CL/cl.h>
 #include <memory>
+#include <vector>
 
 #define CL_TARGET_OPENCL_VERSION 300
 #include <boolinq/boolinq.h>
@@ -21,13 +22,14 @@ OpenCLDevice::OpenCLDevice(
     LOG_INFO << "Searching for device by name (" << device_name << ")." << std::endl;
 
     cl_int err;
-    cl_device_id devices[64];
     cl_uint num_devices;
+
+    // Get number of devices.
     err = clGetDeviceIDs(
         platform->get(),
         CL_DEVICE_TYPE_ALL,
-        64,
-        devices,
+        0,
+        nullptr,
         &num_devices);
     if (err != CL_SUCCESS)
     {
@@ -36,11 +38,23 @@ OpenCLDevice::OpenCLDevice(
         throw std::exception();
     }
 
+    // Get device list.
+    std::vector<cl_device_id> devices(num_devices);
+    err = clGetDeviceIDs(
+        platform->get(),
+        CL_DEVICE_TYPE_ALL,
+        num_devices,
+        devices.data(),
+        nullptr);
+    if (err != CL_SUCCESS)
+    {
+        LOG_ERROR <<
+            "Error in clGetDeviceIDs. (" << err << ")" << std::endl;
+        throw std::exception();
+    }
+
+    // Get first device matching our criteria.
     device_ = boolinq::from(devices)
-        .where_i([&num_devices](const cl_device_id &x, int i)
-            {
-                return i < num_devices;
-            })
         .first([&device_name](const cl_device_id &x)
             {
                 cl_int err;
@@ -64,6 +78,7 @@ OpenCLDevice::OpenCLDevice(
     LOG_INFO << "Selected device (" << device_ << ")." << std::endl;
 
     size_t param_value_size_ret;
+    // Log device type.
     {
         cl_device_type param_value;
         clGetDeviceInfo(
@@ -116,6 +131,7 @@ OpenCLDevice::OpenCLDevice(
 
     try
     {
+        // Enumerate device info.
         boolinq::from(param_names)
             .for_each([this](const std::pair<cl_platform_info, std::string> &x)
                 {

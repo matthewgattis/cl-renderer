@@ -17,6 +17,7 @@ OpenCLContext::OpenCLContext(
     LOG_INFO << "Instance created." << std::endl;
 
     cl_int err;
+    // Create context.
     context_ = clCreateContext(
         nullptr,
         1,
@@ -37,6 +38,7 @@ OpenCLContext::~OpenCLContext()
 {
     if (context_ != nullptr)
     {
+        // Free context.
         clReleaseContext(context_);
         LOG_INFO << "Context released." << std::endl;
     }
