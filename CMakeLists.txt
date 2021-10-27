@@ -26,8 +26,10 @@ find_package(zstd CONFIG REQUIRED)
 set(${PROJECT_NAME}_source
     ./main.cpp
     ./app.cpp
+    ./openclcommandqueue.cpp
     ./openclcontext.cpp
     ./opencldevice.cpp
+    ./openclkernel.cpp
     ./openclplatform.cpp
     ./openclprogram.cpp
     )
@@ -35,8 +37,10 @@ set(${PROJECT_NAME}_source
 set(${PROJECT_NAME}_include
     ./app.hpp
     ./log.hpp
+    ./openclcommandqueue.hpp
     ./openclcontext.hpp
     ./opencldevice.hpp
+    ./openclkernel.hpp
     ./openclplatform.hpp
     ./openclprogram.hpp
     )

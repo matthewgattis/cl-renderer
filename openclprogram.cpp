@@ -108,3 +108,8 @@ OpenCLProgram::~OpenCLProgram()
     }
 }
 
+const cl_program &OpenCLProgram::get() const
+{
+    return program_;
+}
+

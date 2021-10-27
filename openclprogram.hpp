@@ -18,7 +18,7 @@ public:
 
     ~OpenCLProgram();
 
-    const cl_context &get() const;
+    const cl_program &get() const;
 
 private:
     cl_program program_;
