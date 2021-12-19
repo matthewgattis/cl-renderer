@@ -12,7 +12,8 @@ OpenCLMem::OpenCLMem(
     const std::shared_ptr<OpenCLContext> &context,
     int tile_size)
     :
-        context_(context)
+        context_(context),
+        tile_size_(tile_size)
 {
     LOG_INFO << "Instance created." << std::endl;
 
@@ -45,5 +46,10 @@ OpenCLMem::~OpenCLMem()
 const cl_mem &OpenCLMem::get() const
 {
     return mem_;
+}
+
+int OpenCLMem::tile_size() const
+{
+    return tile_size_;
 }
 

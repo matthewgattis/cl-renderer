@@ -16,8 +16,7 @@ public:
         const std::string &kernel_name,
         const std::shared_ptr<OpenCLMem> &mem,
         int width,
-        int height,
-        int tile_size);
+        int height);
 
     ~OpenCLKernel();
 

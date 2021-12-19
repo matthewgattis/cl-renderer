@@ -30,6 +30,7 @@ set(${PROJECT_NAME}_source
     ./openclcontext.cpp
     ./opencldevice.cpp
     ./openclkernel.cpp
+    ./openclmem.cpp
     ./openclplatform.cpp
     ./openclprogram.cpp
     )
@@ -41,6 +42,7 @@ set(${PROJECT_NAME}_include
     ./openclcontext.hpp
     ./opencldevice.hpp
     ./openclkernel.hpp
+    ./openclmem.hpp
     ./openclplatform.hpp
     ./openclprogram.hpp
     )

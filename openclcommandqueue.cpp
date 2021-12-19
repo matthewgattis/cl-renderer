@@ -33,7 +33,7 @@ OpenCLCommandQueue::~OpenCLCommandQueue()
 {
     if (command_queue_ != nullptr)
     {
-        // Free program.
+        // Free command queue.
         clReleaseCommandQueue(command_queue_);
         LOG_INFO << "Command queue released." << std::endl;
     }
