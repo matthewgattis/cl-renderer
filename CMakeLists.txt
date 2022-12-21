@@ -33,6 +33,7 @@ set(${PROJECT_NAME}_source
     ./openclmem.cpp
     ./openclplatform.cpp
     ./openclprogram.cpp
+    ./pngimagewriter.cpp
     )
 
 set(${PROJECT_NAME}_include
@@ -45,6 +46,7 @@ set(${PROJECT_NAME}_include
     ./openclmem.hpp
     ./openclplatform.hpp
     ./openclprogram.hpp
+    ./pngimagewriter.hpp
     )
 
 add_executable(${PROJECT_NAME}

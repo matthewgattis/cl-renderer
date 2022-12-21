@@ -19,8 +19,6 @@ OpenCLKernel::OpenCLKernel(
         kernel_(nullptr),
         program_(program)
 {
-    LOG_INFO << "Instance created." << std::endl;
-
     cl_int err;
     // Create kernel.
     kernel_ = clCreateKernel(

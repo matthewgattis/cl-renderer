@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #define CL_TARGET_OPENCL_VERSION 300
 #include <CL/cl.h>
@@ -16,6 +17,8 @@ public:
         int tile_size);
 
     ~OpenCLMem();
+
+    std::vector<float> value(const cl_command_queue command_queue) const;
 
     const cl_mem &get() const;
 

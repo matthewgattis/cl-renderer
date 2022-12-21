@@ -11,8 +11,6 @@ OpenCLCommandQueue::OpenCLCommandQueue(
     const std::shared_ptr<OpenCLDevice> &device)
     : command_queue_(nullptr)
 {
-    LOG_INFO << "Instance created." << std::endl;
-
     cl_int err;
     // Create command queue.
     command_queue_ = clCreateCommandQueueWithProperties(

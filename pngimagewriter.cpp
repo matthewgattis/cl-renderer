@@ -71,15 +71,15 @@ void PNGImageWriter::writeImage(
     // PNG compression level.
     png_set_compression_level(png_ptr, 9);
 
-    int height = pixels.size() / 3 / width;
+    int height = pixels.size() / 4 / width;
 
     png_set_IHDR(
         png_ptr,
         info_ptr,
         width,
         height,
-        16,
-        PNG_COLOR_TYPE_RGB,
+        8,
+        PNG_COLOR_TYPE_RGBA,
         PNG_INTERLACE_NONE,
         PNG_COMPRESSION_TYPE_BASE,
         PNG_FILTER_TYPE_BASE);
@@ -88,17 +88,17 @@ void PNGImageWriter::writeImage(
 
     png_set_swap(png_ptr);
 
-    row = new png_byte[2 * 3 * width];
+    row = new png_byte[1 * 4 * width];
 
     for (int y = 0; y < height; y++)
     {
         for (int x = 0; x < width; x++)
         {
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 4; i++)
             {
-                unsigned short c = 
-                    65535.0f * std::max(0.0f, std::min(pixels[3 * (x + y * width) + i], 1.0f));
-                ((unsigned short *)row)[3 * x + i] = c;
+                unsigned char c = 
+                    255.0f * std::max(0.0f, std::min(pixels[4 * (x + y * width) + i], 1.0f));
+                ((unsigned char *)row)[4 * x + i] = c;
             }
         }
         png_write_row(png_ptr, row);

@@ -10,24 +10,24 @@
 #include "openclmem.hpp"
 #include "openclplatform.hpp"
 #include "openclprogram.hpp"
+#include "pngimagewriter.hpp"
 
 #define LOG_MODULE_NAME ("App")
 #include "log.hpp"
 
 App::App()
 {
-    LOG_INFO << "Instance created." << std::endl;
 }
 
 void App::run(const std::vector<std::string> &args)
 {
     const int width = 800;
     const int height = 600;
-    const int tile_size = 128;
-    const int samples = 1;
+    const int tile_size =128;
+    const int samples = 64;
 
-    auto platform = std::make_shared<OpenCLPlatform>("NVIDIA CUDA");
-    auto device = std::make_shared<OpenCLDevice>(platform, "NVIDIA GeForce GTX 970");
+    auto platform = std::make_shared<OpenCLPlatform>("Intel(R) OpenCL HD Graphics");
+    auto device = std::make_shared<OpenCLDevice>(platform, "Intel(R) Graphics [0x46a6]");
     auto context = std::make_shared<OpenCLContext>(device);
     std::ifstream ifs("program.cl");
     auto program = std::make_shared<OpenCLProgram>(context, device, ifs);
@@ -39,6 +39,9 @@ void App::run(const std::vector<std::string> &args)
         width / tile_size + ((width % tile_size) > 0 ? 1 : 0);
     int tile_y_count =
         height / tile_size + ((height % tile_size) > 0 ? 1 : 0);
+
+    std::vector<float> image;
+    image.resize(4 * width * height);
 
     cl_int err;
 
@@ -85,9 +88,25 @@ void App::run(const std::vector<std::string> &args)
                     throw std::exception();
                 }
             }
+
+            command_queue->finish();
+            std::vector<float> tile = mem->value(command_queue->get());
+
+            for (int j = 0; j < tile_size; j++)
+            {
+                for (int i = 0; i < tile_size; i++)
+                {
+                    int ix = i + x * tile_size;
+                    int iy = j + y * tile_size;
+                    if (ix < width && iy < height)
+                        for (int k = 0; k < 4; k++)
+                            image[4 * (ix + width * (height - 1 - iy)) + k] = tile[4 * (i + tile_size * j) + k];
+                }
+            }
         }
     }
 
     command_queue->finish();
+    PNGImageWriter::writeImage("out.png", image, width);
 }
 

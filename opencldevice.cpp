@@ -17,8 +17,6 @@ OpenCLDevice::OpenCLDevice(
     const std::string &device_name)
     : device_(nullptr)
 {
-    LOG_INFO << "Instance created." << std::endl;
-
     LOG_INFO << "Searching for device by name (" << device_name << ")." << std::endl;
 
     cl_int err;

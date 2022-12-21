@@ -14,8 +14,6 @@ OpenCLContext::OpenCLContext(
     const std::shared_ptr<OpenCLDevice> &device)
     : context_(nullptr)
 {
-    LOG_INFO << "Instance created." << std::endl;
-
     cl_int err;
     // Create context.
     context_ = clCreateContext(

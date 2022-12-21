@@ -19,8 +19,6 @@ OpenCLProgram::OpenCLProgram(
     : program_(nullptr),
       context_(context)
 {
-    LOG_INFO << "Instance created." << std::endl;
-
     // Read source code from stream.
     std::stringstream ss;
     ss << is.rdbuf();

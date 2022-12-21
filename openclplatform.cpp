@@ -15,8 +15,6 @@ OpenCLPlatform::OpenCLPlatform(
     const std::string &platform_name)
     : platform_(nullptr)
 {
-    LOG_INFO << "Instance created." << std::endl;
-
     cl_int err;
     cl_uint num_platforms;
     // Get number of platforms.
