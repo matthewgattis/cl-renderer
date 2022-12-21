@@ -89,7 +89,6 @@ OpenCLKernel::OpenCLKernel(
         throw std::exception();
     }
     LOG_INFO << "Set height. (" << arg_value << ")" << std::endl;
-
 }
 
 OpenCLKernel::~OpenCLKernel()

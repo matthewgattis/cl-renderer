@@ -1,6 +1,5 @@
 #include "app.hpp"
 
-#include <boolinq/boolinq.h>
 #include <fstream>
 #include <memory>
 
@@ -89,12 +88,6 @@ void App::run(const std::vector<std::string> &args)
         }
     }
 
-    err = clFinish(command_queue->get());
-    if (err != CL_SUCCESS)
-    {
-        LOG_ERROR <<
-            "Error in clFinish. (" << err << ")" << std::endl;
-        throw std::exception();
-    }
+    command_queue->finish();
 }
 

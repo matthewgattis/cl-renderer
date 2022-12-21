@@ -19,6 +19,8 @@ public:
 
     const cl_command_queue &get() const;
 
+    void finish();
+
 private:
     cl_command_queue command_queue_;
 };

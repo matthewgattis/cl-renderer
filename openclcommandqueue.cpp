@@ -44,3 +44,15 @@ const cl_command_queue &OpenCLCommandQueue::get() const
     return command_queue_;
 }
 
+void OpenCLCommandQueue::finish()
+{
+    cl_int err;
+    err = clFinish(command_queue_);
+    if (err != CL_SUCCESS)
+    {
+        LOG_ERROR <<
+            "Error in clFinish. (" << err << ")" << std::endl;
+        throw std::exception();
+    }
+}
+
