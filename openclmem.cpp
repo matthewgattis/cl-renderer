@@ -41,7 +41,7 @@ OpenCLMem::~OpenCLMem()
     }
 }
 
-std::vector<float> OpenCLMem::value(const cl_command_queue command_queue) const
+std::vector<float> OpenCLMem::getBuffer(const cl_command_queue command_queue) const
 {
     std::vector<float> a;
     a.resize(4 * tile_size_ * tile_size_);

@@ -58,7 +58,7 @@ OpenCLDevice::OpenCLDevice(
                 cl_int err;
                 char param_value[32767];
                 size_t param_value_size_ret;
-                clGetDeviceInfo(
+                err = clGetDeviceInfo(
                     x,
                     CL_DEVICE_NAME,
                     32767,

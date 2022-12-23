@@ -26,8 +26,8 @@ void App::run(const std::vector<std::string> &args)
     const int tile_size =128;
     const int samples = 64;
 
-    auto platform = std::make_shared<OpenCLPlatform>("Intel(R) OpenCL HD Graphics");
-    auto device = std::make_shared<OpenCLDevice>(platform, "Intel(R) Graphics [0x46a6]");
+    auto platform = std::make_shared<OpenCLPlatform>("NVIDIA CUDA");
+    auto device = std::make_shared<OpenCLDevice>(platform, "NVIDIA GeForce GTX 1080 Ti");
     auto context = std::make_shared<OpenCLContext>(device);
     std::ifstream ifs("program.cl");
     auto program = std::make_shared<OpenCLProgram>(context, device, ifs);
@@ -90,7 +90,7 @@ void App::run(const std::vector<std::string> &args)
             }
 
             command_queue->finish();
-            std::vector<float> tile = mem->value(command_queue->get());
+            std::vector<float> tile = mem->getBuffer(command_queue->get());
 
             for (int j = 0; j < tile_size; j++)
             {

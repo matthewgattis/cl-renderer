@@ -18,7 +18,7 @@ public:
 
     ~OpenCLMem();
 
-    std::vector<float> value(const cl_command_queue command_queue) const;
+    std::vector<float> getBuffer(const cl_command_queue command_queue) const;
 
     const cl_mem &get() const;
 

@@ -34,6 +34,8 @@ set(${PROJECT_NAME}_source
     ./openclplatform.cpp
     ./openclprogram.cpp
     ./pngimagewriter.cpp
+    ./tile.cpp
+    ./tilemap.cpp
     )
 
 set(${PROJECT_NAME}_include
@@ -47,6 +49,9 @@ set(${PROJECT_NAME}_include
     ./openclplatform.hpp
     ./openclprogram.hpp
     ./pngimagewriter.hpp
+    ./serializable.hpp
+    ./tile.hpp
+    ./tilemap.hpp
     )
 
 add_executable(${PROJECT_NAME}
