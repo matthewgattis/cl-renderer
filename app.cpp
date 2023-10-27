@@ -31,9 +31,9 @@ void App::run(const std::vector<std::string> &args)
     auto context = std::make_shared<OpenCLContext>(device);
     std::ifstream ifs("program.cl");
     auto program = std::make_shared<OpenCLProgram>(context, device, ifs);
-    auto mem = std::make_shared<OpenCLMem>(context, tile_size);
-    auto kernel = std::make_shared<OpenCLKernel>(program, "mainimage", mem, width, height);
     auto command_queue = std::make_shared<OpenCLCommandQueue>(context, device);
+    auto mem = std::make_shared<OpenCLMem>(context, command_queue, tile_size);
+    auto kernel = std::make_shared<OpenCLKernel>(program, "mainimage", mem, width, height);
 
     int tile_x_count =
         width / tile_size + ((width % tile_size) > 0 ? 1 : 0);
@@ -90,7 +90,7 @@ void App::run(const std::vector<std::string> &args)
             }
 
             command_queue->finish();
-            std::vector<float> tile = mem->getBuffer(command_queue->get());
+            std::vector<float> tile = mem->getBuffer();
 
             for (int j = 0; j < tile_size; j++)
             {

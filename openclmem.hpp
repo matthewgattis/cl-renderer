@@ -7,18 +7,26 @@
 #define CL_TARGET_OPENCL_VERSION 300
 #include <CL/cl.h>
 
-class OpenCLContext;
+#include "image.hpp"
 
-class OpenCLMem
+class OpenCLContext;
+class OpenCLCommandQueue;
+
+class OpenCLMem : public Image
 {
 public:
     OpenCLMem(
         const std::shared_ptr<OpenCLContext> &context,
+        const std::shared_ptr<OpenCLCommandQueue> &command_queue,
         int tile_size);
 
     ~OpenCLMem();
 
-    std::vector<float> getBuffer(const cl_command_queue command_queue) const;
+    std::vector<float> getBuffer() const override;
+
+    int getWidth() const override;
+
+    int getHeight() const override;
 
     const cl_mem &get() const;
 
@@ -29,5 +37,6 @@ private:
     int tile_size_;
 
     std::shared_ptr<OpenCLContext> context_;
+    std::shared_ptr<OpenCLCommandQueue> command_queue_;
 };
 
