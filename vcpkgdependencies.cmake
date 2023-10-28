@@ -1,22 +1,22 @@
 
-function(vcpkg_install commit)
+function(vcpkg_install)
     if(NOT EXISTS ${VCPKG_ROOT})
         message("vcpkg install git clone to ${VCPKG_ROOT}")
         execute_process(
             COMMAND git clone https://github.com/microsoft/vcpkg.git ${VCPKG_ROOT})
     endif()
 
-    if(DEFINED commit)
-        message("vcpkg install git checkout ${commit}")
-        execute_process(
-            COMMAND git checkout ${commit}
-            WORKING_DIRECTORY ${VCPKG_ROOT})
-    endif()
+    # if(DEFINED commit)
+    #     message("vcpkg install git checkout ${commit}")
+    #     execute_process(
+    #         COMMAND git checkout ${commit}
+    #         WORKING_DIRECTORY ${VCPKG_ROOT})
+    # endif()
 
-    message("vcpkg install git pull")
-    execute_process(
-        COMMAND git pull
-        WORKING_DIRECTORY ${VCPKG_ROOT})
+    # message("vcpkg install git pull")
+    # execute_process(
+    #     COMMAND git pull
+    #     WORKING_DIRECTORY ${VCPKG_ROOT})
 
     if(WIN32)
         set(vcpkg_exec ${VCPKG_ROOT}/vcpkg.exe)
@@ -39,7 +39,7 @@ endfunction()
 function(vcpkg_add_dependencies)
     message("vcpkg add dependencies ${ARGN}")
     execute_process(
-        COMMAND ${VCPKG_EXEC} install ${ARGN} --triplet ${VCPKG_TARGET_TRIPLET}
+        COMMAND ${VCPKG_EXEC} install ${ARGN} --recurse --triplet ${VCPKG_TARGET_TRIPLET}
         WORKING_DIRECTORY ${VCPKG_ROOT}
         )
 endfunction()
