@@ -2,6 +2,15 @@
 
 #include <fstream>
 
+std::vector<std::string> Devices::get() const
+{
+    std::vector<std::string> devices;
+    for (const auto &device : root_)
+        devices.push_back(device.asString());
+
+    return devices;
+}
+
 Devices::Devices(const std::string& filename) :
     Message(),
     Config(filename)

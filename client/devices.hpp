@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <vector>
 
 #include <json/json.h>
@@ -9,6 +10,9 @@
 
 class Devices : public Config, public Message
 {
+public:
+    std::vector<std::string> get() const;
+
 public:
     Devices(const std::string& filename);
     Devices(std::istream& is);

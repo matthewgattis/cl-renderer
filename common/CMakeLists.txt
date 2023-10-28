@@ -25,6 +25,7 @@ set(${PROJECT_NAME}_include
     deserializable.hpp
     message.hpp
     config.hpp
+    zstdutility.hpp
     )
 
 add_library(${PROJECT_NAME}
@@ -45,5 +46,7 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE jsoncpp_object jsoncpp_static
     PRIVATE ${OpenCL_LIBRARIES}
     PRIVATE $<IF:$<TARGET_EXISTS:zstd::libzstd_shared>,zstd::libzstd_shared,zstd::libzstd_static>
+    PRIVATE libzmq libzmq-static
+    PRIVATE unofficial-sodium::sodium unofficial-sodium::sodium_config_public
     )
 

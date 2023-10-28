@@ -17,7 +17,6 @@ vcpkg_add_dependencies(
     "boolinq"
     "jsoncpp"
     "libpng"
-    # https://stackoverflow.com/questions/57745122/how-to-compress-a-c-string-using-zstd
     "zstd"
     "libsodium"
     "zeromq[sodium]"
@@ -28,9 +27,9 @@ vcpkg_add_dependencies(
 find_package(OpenCL REQUIRED)
 find_package(zstd CONFIG REQUIRED)
 find_package(ZeroMQ CONFIG REQUIRED)
+find_package(unofficial-sodium CONFIG REQUIRED)
 find_package(jsoncpp CONFIG REQUIRED)
 find_package(libpng CONFIG REQUIRED)
-find_package(unofficial-sodium CONFIG REQUIRED)
 find_path(PNGPP_INCLUDE_DIRS "png++/color.hpp")
 find_path(BOOLINQ_INCLUDE_DIRS "boolinq/boolinq.h")
 
