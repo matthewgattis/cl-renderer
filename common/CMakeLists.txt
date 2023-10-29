@@ -9,6 +9,7 @@ set(${PROJECT_NAME}_source
     openclmem.cpp
     openclplatform.cpp
     openclprogram.cpp
+    messagefactory.cpp
     )
 
 set(${PROJECT_NAME}_include
@@ -26,6 +27,7 @@ set(${PROJECT_NAME}_include
     message.hpp
     config.hpp
     zstdutility.hpp
+    messagefactory.hpp
     )
 
 add_library(${PROJECT_NAME}

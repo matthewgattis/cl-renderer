@@ -10,7 +10,6 @@
 #include "openclmem.hpp"
 #include "openclplatform.hpp"
 #include "openclprogram.hpp"
-#include "pngimagewriter.hpp"
 
 #define LOG_MODULE_NAME ("App")
 #include "log.hpp"

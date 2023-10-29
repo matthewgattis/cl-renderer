@@ -2,6 +2,7 @@
 
 #include <string>
 #include <memory>
+#include <functional>
 
 #include "serializable.hpp"
 #include "deserializable.hpp"

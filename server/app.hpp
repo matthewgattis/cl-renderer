@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+#include "messagefactory.hpp"
+
 class App
 {
 public:
