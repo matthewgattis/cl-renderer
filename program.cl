@@ -1,6 +1,6 @@
 #define MAX_DISTANCE        (16.0f)
 #define MIN_DELTA           (0.000001f)
-#define MAX_REFLECTIONS     (8)
+#define MAX_REFLECTIONS     (16)
 
 #ifndef M_PI
 #define M_PI                (3.1415926535897932384626433832795f)
@@ -16,6 +16,7 @@ struct surface_feature
 };
 
 // ------------------------------------------------------------------------------------------------
+// http://blog.hvidtfeldts.net/index.php/2015/01/path-tracing-3d-fractals/
 float2 rand2n(float2 *seed)
 {
     *seed += (float2)(-1.0f, 1.0f);
@@ -25,14 +26,12 @@ float2 rand2n(float2 *seed)
         fract(cos(dot((*seed).xy, (float2)(4.898f, 7.23f))) * 23421.631f, &s));
 }
 
-// ------------------------------------------------------------------------------------------------
 float3 ortho(float3 v)
 {
     //  See : http://lolengine.net/blog/2013/09/21/picking-orthogonal-vector-combing-coconuts
     return fabs(v.x) > fabs(v.z) ? (float3)(-v.y, v.x, 0.0f) : (float3)(0.0f, -v.z, v.y);
 }
 
-// ------------------------------------------------------------------------------------------------
 float3 getSampleBiased(float3 dir, float power, float2 *seed)
 {
     dir = normalize(dir);
@@ -45,19 +44,16 @@ float3 getSampleBiased(float3 dir, float power, float2 *seed)
     return cos(r.x)*oneminus*o1 + sin(r.x)*oneminus*o2 + r.y*dir;
 }
 
-// ------------------------------------------------------------------------------------------------
 float3 getSample(float3 dir, float2 *seed)
 {
     return getSampleBiased(dir, 0.0f, seed); // <- unbiased!
 }
 
-// ------------------------------------------------------------------------------------------------
 float3 getCosineWeightedSample(float3 dir, float2 *seed)
 {
     return getSampleBiased(dir, 1.0f, seed);
 }
 
-// ------------------------------------------------------------------------------------------------
 float3 getConeSample(float3 dir, float extent, float2 *seed)
 {
     // Formula 34 in GI Compendium
@@ -102,6 +98,55 @@ float sphere(float3 p, float r)
 }
 
 // ------------------------------------------------------------------------------------------------
+// http://www.fractalforums.com/sierpinski-gasket/kaleidoscopic-(escape-time-ifs)/
+#define DE2_SCALE   (3.1f)
+#define DE2_OFFSET  ((float3)(1.0f, 1.0f, 1.0f))
+#define DE2_ITER    (48)
+float DE2(float3 z, float *orbit)
+{
+    float r;
+    float d;
+
+    float min_dist = 1e9f;
+
+    for (int n = 0; n < DE2_ITER; n++)
+    {
+        //if (z.x + z.y < 0.0f) { z.xy = -z.yx; } // fold 1
+        //if (z.x + z.z < 0.0f) { z.xz = -z.zx; } // fold 2
+        //if (z.y + z.z < 0.0f) { z.zy = -z.yz; } // fold 3  
+
+        z = vRotateX(z, 0.1f);
+
+        z = fabs(z);
+        if (z.x - z.y < 0.0f) { z.xy = z.yx; } // fold 1
+        if (z.x - z.z < 0.0f) { z.xz = z.zx; } // fold 2
+        if (z.y - z.z < 0.0f) { z.zy = z.yz; } // fold 3  
+
+        //z.z -= 0.5f * DE2_OFFSET.z * (DE2_SCALE - 1.0f);
+        //z.z = -fabs(z.z);
+        //z.z += 0.5f * DE2_OFFSET.z * (DE2_SCALE - 1.0f);
+
+        //if (z.x - z.y < 0.0f) { z.xy = z.yx; }
+        //if (z.x + z.y < 0.0f) { z.xy = -z.yx; } // fold 1
+        //if (z.x - z.z < 0.0f) { z.xz = z.zx; }
+        //if (z.x + z.z < 0.0f) { z.xz = -z.zx; } // fold 2
+
+        z.xy = z.xy * DE2_SCALE - DE2_OFFSET.xy * (DE2_SCALE - 1.0f);
+        z.z = z.z * DE2_SCALE;
+        if (z.z > 0.5f * DE2_OFFSET.z * (DE2_SCALE - 1.0f))
+            z.z -= DE2_OFFSET.z * (DE2_SCALE - 1.0f);
+
+        d = length(z);
+        min_dist = min(min_dist, d);
+    }
+
+    *orbit = min_dist;
+    return d * pow(DE2_SCALE, -(float)DE2_ITER);
+}
+
+// ------------------------------------------------------------------------------------------------
+// http://www.fractalforums.com/sierpinski-gasket/kaleidoscopic-(escape-time-ifs)/
+/*
 #define DE2_SCALE   (1.5f)
 #define DE2_OFFSET  (2.0f)
 #define DE2_ITER    (48)
@@ -128,6 +173,7 @@ float DE2(float3 z, float *orbit)
     *orbit = min_dist;
     return d * pow(DE2_SCALE, -(float)DE2_ITER);
 }
+*/
 
 // ------------------------------------------------------------------------------------------------
 #define DE3_ITER            (32)
@@ -190,7 +236,7 @@ float getMap(float3 p, struct surface_feature *surf)
     float tp;
 
     surf->obj = 1;
-    t = DE3(p, &(surf->orbit));
+    t = DE2(p, &(surf->orbit));
 
     return t;
 }
@@ -251,6 +297,7 @@ void focus(float a, float b, float3 *o, float3 *d, float2 *seed)
 }
 
 // ------------------------------------------------------------------------------------------------
+// https://iquilezles.org/articles/palettes/
 float3 pal(float t, float3 a, float3 b, float3 c, float3 d )
 {
     const float TWO_PI = 2.0f * M_PI;
@@ -263,17 +310,15 @@ float4 drawScene(float2 p, float2 *seed)
     struct surface_feature surf[MAX_REFLECTIONS];
     struct surface_feature surf_shad;
 
-    float3 origin = (float3)(-2.6f, -4.0f, 6.2f);
-    float3 direction = (float3)(p.x, p.y, -2.0f);
-
-    float3 o = origin;
-    float3 d = direction;
+    float3 o = (float3)(-0.6f, -0.5f, 1.2f);
+    float3 d = (float3)(p.x, p.y, -2.0f);
+    float3 q = (float3)(0.0f, 0.0f, -2.0f);
 
     d = vRotateY(d, 0.4f);
     d = vRotateX(d, -0.6f);
 
-    *seed = *seed + (float2)(8436.4156f, 7864.1684f);
-    focus(0.12f, 0.00001f, &o, &d, seed);
+    //*seed = *seed + (float2)(8436.4156f, 7864.1684f);
+    focus(0.1525f, 0.00001f, &o, &d, seed);
 
     const float3 light_vec = normalize((float3)(2.0f, 1.0f, 3.0f));
 
@@ -325,7 +370,7 @@ float4 drawScene(float2 p, float2 *seed)
 
                     if (surf[j].obj_shad == 0)
                     {
-                        comp += 4.0f * (float3)(1.0f, 0.8f, 0.6f) * color * max(0.0f, dot(surf[j].n, light_vec));
+                        comp += 6.0f * (float3)(1.0f, 0.8f, 0.6f) * color * max(0.0f, dot(surf[j].n, light_vec));
                     }
                     break;
                 }

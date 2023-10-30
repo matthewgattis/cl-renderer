@@ -37,7 +37,6 @@ void App::run(const std::vector<std::string> &args)
     const int height = 768;
     const int tile_size = 128;
     const int samples = 64;
-    //const int samples = 1;
 
     int tile_x_count =
         width / tile_size + ((width % tile_size) > 0 ? 1 : 0);
