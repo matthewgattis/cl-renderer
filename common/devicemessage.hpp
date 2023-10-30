@@ -9,19 +9,19 @@
 #include "config.hpp"
 #include "message.hpp"
 
-class Devices : public Config, public Message
+class DeviceMessage : public Message
 {
 public:
     static const std::function<std::shared_ptr<Message>(std::istream&)> INSTANTIATOR;
+    static const std::string TYPE;
 
 public:
     std::vector<std::string> getDevices() const;
 
 public:
-    Devices(const std::string& filename);
-    Devices(std::istream& is);
+    DeviceMessage(std::istream& is);
 
-    virtual std::string getType() const;
+    virtual std::string getType() const override;
     virtual std::ostream& serialize(std::ostream& os) const override;
     virtual std::istream& deserialize(std::istream& is) override;
 

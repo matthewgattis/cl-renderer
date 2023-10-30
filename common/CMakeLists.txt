@@ -10,6 +10,7 @@ set(${PROJECT_NAME}_source
     openclplatform.cpp
     openclprogram.cpp
     messagefactory.cpp
+    devicemessage.cpp
     )
 
 set(${PROJECT_NAME}_include
@@ -28,6 +29,7 @@ set(${PROJECT_NAME}_include
     config.hpp
     zstdutility.hpp
     messagefactory.hpp
+    devicemessage.hpp
     )
 
 add_library(${PROJECT_NAME}

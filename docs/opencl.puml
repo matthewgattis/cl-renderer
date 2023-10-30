@@ -1,0 +1,19 @@
+@startuml
+
+class OpenCLPlatform
+class OpenCLDevice
+class OpenCLContext
+class OpenCLProgram
+class OpenCLCommandQueue
+class OpenCLMem
+class OpenCLKernal
+
+OpenCLDevice --> OpenCLPlatform
+OpenCLContext --> OpenCLDevice
+OpenCLProgram --> OpenCLContext
+OpenCLProgram --> OpenCLDevice
+OpenCLMem --> OpenCLContext
+OpenCLMem --> OpenCLCommandQueue
+OpenCLKernal --> OpenCLProgram
+
+@enduml

@@ -1,0 +1,33 @@
+@startuml
+
+interface Serialize
+
+interface Deserialize
+{
+    Deserialize(is : std::istream&)
+}
+
+interface Message
+{
+    {static} + instantiate : std::function<std::shared_ptr<Message>(std::istream&)>
+    + getType() : std::string
+}
+
+interface Config
+{
+    Config(filename : const std::string&)
+}
+
+class MessageFactory
+{
+    + MessageFactory(instantiators  : std::map<std::string, std::function<std::shared_ptr<Message>(std::istream&)>)
+    + instantiate(type : std::string) : std::shared_ptr<Message>
+}
+
+Message --|> Serialize
+Message --|> Deserialize
+Config --|> Deserialize
+
+MessageFactory --> Message : instantiates
+
+@enduml

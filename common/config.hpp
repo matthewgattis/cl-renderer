@@ -17,5 +17,10 @@ protected:
         Deserializable(is)
     {
     }
+
+private:
+    Config()
+    {
+    }
 };
 

@@ -1,0 +1,10 @@
+{
+	"program": "program.cl",
+	"width": 800,
+	"height": 600,
+	"tile_size": 128,
+	"samples": 64,
+	"image_count": 1,
+	"image_format": "frame_%02d.png"
+}
+

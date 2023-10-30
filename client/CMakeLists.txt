@@ -4,12 +4,12 @@ project(cl-renderer-client VERSION 0.1.0)
 set(${PROJECT_NAME}_source
     main.cpp
     app.cpp
-    devices.cpp
+    deviceconfig.cpp
     )
 
 set(${PROJECT_NAME}_include
     app.hpp
-    devices.hpp
+    deviceconfig.hpp
     )
 
 add_executable(${PROJECT_NAME}
