@@ -15,6 +15,8 @@ OpenCLPlatform::OpenCLPlatform(
     const std::string &platform_name)
     : platform_(nullptr)
 {
+    LOG_INFO << "Searching for platform by name. (" << platform_name << ")" << std::endl;
+
     cl_int err;
     cl_uint num_platforms;
     // Get number of platforms.
@@ -62,6 +64,7 @@ OpenCLPlatform::OpenCLPlatform(
                         "Error in clGetPlatformInfo. (" << err << ")" << std::endl;
                     throw std::exception();
                 }
+                LOG_INFO << "Platform name. (" << param_value << ")" << std::endl;
                 return std::string(param_value).compare(
                     platform_name) == 0;
             });

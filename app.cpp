@@ -3,6 +3,8 @@
 #include <fstream>
 #include <memory>
 
+#include <png++/png.hpp>
+
 #include "openclcommandqueue.hpp"
 #include "openclcontext.hpp"
 #include "opencldevice.hpp"
@@ -19,14 +21,37 @@ App::App()
 {
 }
 
+inline float min(float a, float b)
+{
+    return a < b ? a : b;
+}
+
+inline float max(float a, float b)
+{
+    return a > b ? a : b;
+}
+
 void App::run(const std::vector<std::string> &args)
 {
-    const int width = 800;
-    const int height = 600;
-    const int tile_size =128;
+    const int width = 1366;
+    const int height = 768;
+    const int tile_size = 128;
     const int samples = 64;
+    //const int samples = 1;
 
-    auto platform = std::make_shared<OpenCLPlatform>("Intel(R) OpenCL HD Graphics");
+    int tile_x_count =
+        width / tile_size + ((width % tile_size) > 0 ? 1 : 0);
+    int tile_y_count =
+        height / tile_size + ((height % tile_size) > 0 ? 1 : 0);
+
+    LOG_INFO << "width (" << width << ")" << std::endl;
+    LOG_INFO << "height (" << height << ")" << std::endl;
+    LOG_INFO << "tile_size (" << tile_size << ")" << std::endl;
+    LOG_INFO << "samples (" << samples << ")" << std::endl;
+    LOG_INFO << "tile_x_count (" << tile_x_count << ")" << std::endl;
+    LOG_INFO << "tile_y_count (" << tile_y_count << ")" << std::endl;
+
+    auto platform = std::make_shared<OpenCLPlatform>("Intel(R) OpenCL Graphics");
     auto device = std::make_shared<OpenCLDevice>(platform, "Intel(R) Graphics [0x46a6]");
     auto context = std::make_shared<OpenCLContext>(device);
     std::ifstream ifs("program.cl");
@@ -35,13 +60,7 @@ void App::run(const std::vector<std::string> &args)
     auto kernel = std::make_shared<OpenCLKernel>(program, "mainimage", mem, width, height);
     auto command_queue = std::make_shared<OpenCLCommandQueue>(context, device);
 
-    int tile_x_count =
-        width / tile_size + ((width % tile_size) > 0 ? 1 : 0);
-    int tile_y_count =
-        height / tile_size + ((height % tile_size) > 0 ? 1 : 0);
-
-    std::vector<float> image;
-    image.resize(4 * width * height);
+    png::image<png::rgb_pixel> image(width, height);
 
     cl_int err;
 
@@ -64,12 +83,13 @@ void App::run(const std::vector<std::string> &args)
             global_work_offset[0] = x * tile_size;
             global_work_offset[1] = y * tile_size;
 
+            LOG_INFO <<
+                "Enqueuing tile (" << x << " " << y << ") sample (" << samples << ")." << std::endl;
+
             for (int z = 0; z < samples; z++)
             {
                 global_work_offset[2] = z;
 
-                LOG_INFO <<
-                    "Enqueuing tile (" << x << " " << y << ") sample (" << z << ")." << std::endl;
 
                 err = clEnqueueNDRangeKernel(
                     command_queue->get(),
@@ -92,21 +112,29 @@ void App::run(const std::vector<std::string> &args)
             command_queue->finish();
             std::vector<float> tile = mem->value(command_queue->get());
 
-            for (int j = 0; j < tile_size; j++)
+            int tile_width = width - x * tile_size;
+            tile_width = tile_width > tile_size ? tile_size : tile_width;
+            int tile_height = height - y * tile_size;
+            tile_height = tile_height > tile_size ? tile_size : tile_height;
+
+            for (int j = 0; j < tile_height; j++)
             {
-                for (int i = 0; i < tile_size; i++)
+                for (int i = 0; i < tile_width; i++)
                 {
-                    int ix = i + x * tile_size;
-                    int iy = j + y * tile_size;
-                    if (ix < width && iy < height)
-                        for (int k = 0; k < 4; k++)
-                            image[4 * (ix + width * (height - 1 - iy)) + k] = tile[4 * (i + tile_size * j) + k];
+                    int k = x * tile_size + i;
+                    int l = y * tile_size + j;
+                    float r = min(max(0.0f, tile[4 * (i + tile_size * j) + 0] * 255.0f), 255.0f);
+                    float g = min(max(0.0f, tile[4 * (i + tile_size * j) + 1] * 255.0f), 255.0f);
+                    float b = min(max(0.0f, tile[4 * (i + tile_size * j) + 2] * 255.0f), 255.0f);
+                    image[height - l - 1][k] = png::rgb_pixel(r, g, b);
                 }
             }
         }
     }
 
     command_queue->finish();
-    PNGImageWriter::writeImage("out.png", image, width);
+
+    LOG_INFO << "png++ image write (" << "out.png" << ")." << std::endl;
+    image.write("out.png");
 }
 
