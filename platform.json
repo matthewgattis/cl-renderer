@@ -1,0 +1,14 @@
+[
+	{
+		"platform": "NVIDIA CUDA",
+		"devices":[
+			"Quadro RTX 3000"
+		]
+	},
+	{
+		"platform": "Intel(R) OpenCL HD Graphics",
+		"devices":[
+			"Intel(R) UHD Graphics"
+		]
+	}
+]

@@ -30,27 +30,35 @@ find_package(zstd CONFIG REQUIRED)
 find_package(PNG REQUIRED)
 
 set(${PROJECT_NAME}_source
-    ./main.cpp
-    ./app.cpp
-    ./openclcommandqueue.cpp
-    ./openclcontext.cpp
-    ./opencldevice.cpp
-    ./openclkernel.cpp
-    ./openclmem.cpp
-    ./openclplatform.cpp
-    ./openclprogram.cpp
+    main.cpp
+    app.cpp
+    openclcommandqueue.cpp
+    openclcontext.cpp
+    opencldevice.cpp
+    openclkernel.cpp
+    openclmem.cpp
+    openclplatform.cpp
+    openclprogram.cpp
+    deviceconfig.cpp
+    projectconfig.cpp
     )
 
 set(${PROJECT_NAME}_include
-    ./app.hpp
-    ./log.hpp
-    ./openclcommandqueue.hpp
-    ./openclcontext.hpp
-    ./opencldevice.hpp
-    ./openclkernel.hpp
-    ./openclmem.hpp
-    ./openclplatform.hpp
-    ./openclprogram.hpp
+    app.hpp
+    log.hpp
+    openclcommandqueue.hpp
+    openclcontext.hpp
+    opencldevice.hpp
+    openclkernel.hpp
+    openclmem.hpp
+    openclplatform.hpp
+    openclprogram.hpp
+    serializable.hpp
+    deserializable.hpp
+    jsonconfig.hpp
+    deviceconfig.hpp
+    projectconfig.hpp
+    image.hpp
     )
 
 add_executable(${PROJECT_NAME}
@@ -68,9 +76,9 @@ target_include_directories(${PROJECT_NAME}
     )
 
 target_link_libraries(${PROJECT_NAME}
-    PRIVATE jsoncpp_object jsoncpp_static
+    PRIVATE JsonCpp::JsonCpp
     PRIVATE ${OpenCL_LIBRARIES}
-    PRIVATE zstd::libzstd_static
+    PRIVATE $<IF:$<TARGET_EXISTS:zstd::libzstd_shared>,zstd::libzstd_shared,zstd::libzstd_static>
     PRIVATE PNG::PNG
     )
 

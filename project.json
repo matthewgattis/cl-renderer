@@ -1,0 +1,10 @@
+{
+    "program": "program.cl",
+    "kernel": "mainimage",
+    "image_count": 1,
+    "output": "frame_20231031_095855_%02d.png",
+    "width": 1280,
+    "height": 720,
+    "tile_size": 128,
+    "samples": 64
+}

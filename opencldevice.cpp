@@ -53,15 +53,15 @@ OpenCLDevice::OpenCLDevice(
 
     // Get first device matching our criteria.
     device_ = boolinq::from(devices)
-        .first([&device_name](const cl_device_id &x)
+        .first([&device_name](const cl_device_id &x) -> bool
             {
                 cl_int err;
-                char param_value[32767];
+                char param_value[1024];
                 size_t param_value_size_ret;
-                clGetDeviceInfo(
+                err = clGetDeviceInfo(
                     x,
                     CL_DEVICE_NAME,
-                    32767,
+                    1024,
                     param_value,
                     &param_value_size_ret);
                 if (err != CL_SUCCESS)
@@ -70,6 +70,7 @@ OpenCLDevice::OpenCLDevice(
                         "Error in clGetDeviceInfo. (" << err << ")" << std::endl;
                     throw std::exception();
                 }
+                param_value[1023] = 0;
                 return std::string(param_value).compare(device_name) == 0;
             });
 
@@ -131,26 +132,27 @@ OpenCLDevice::OpenCLDevice(
     {
         // Enumerate device info.
         boolinq::from(param_names)
-            .for_each([this](const std::pair<cl_platform_info, std::string> &x)
-                {
-                    cl_int err;
-                    char param_value[32767];
-                    size_t  param_value_size_ret;
-                    err = clGetDeviceInfo(
-                        this->device_,
-                        x.first,
-                        32767,
-                        param_value,
-                        &param_value_size_ret);
-                    if (err != CL_SUCCESS)
-                    {
-                        LOG_ERROR <<
-                            "Error in clGetDeviceInfo. (" << err << ")" << std::endl;
-                        throw std::exception();
-                    }
-                    LOG_INFO <<
-                        "Device " << x.second << " (" << std::string(param_value) << ")." << std::endl;
-                });
+            .for_each([this](const std::pair<cl_platform_info, std::string> &x) -> void
+			{
+				cl_int err;
+				char param_value[1024];
+				size_t  param_value_size_ret;
+				err = clGetDeviceInfo(
+					this->device_,
+					x.first,
+					1024,
+					param_value,
+					&param_value_size_ret);
+				if (err != CL_SUCCESS)
+				{
+					LOG_ERROR <<
+						"Error in clGetDeviceInfo. (" << err << ")" << std::endl;
+					throw std::exception();
+				}
+				param_value[1023] = 0;
+				LOG_INFO <<
+					"Device " << x.second << " (" << std::string(param_value) << ")." << std::endl;
+			});
     }
     catch (const std::exception &e)
     {

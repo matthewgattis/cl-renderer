@@ -4,16 +4,18 @@
 #include <CL/cl.h>
 
 #include "openclcontext.hpp"
+#include "openclcommandqueue.hpp"
 
 #define LOG_MODULE_NAME ("OpenCLMem")
 #include "log.hpp"
 
 OpenCLMem::OpenCLMem(
     const std::shared_ptr<OpenCLContext> &context,
-    int tile_size)
-    :
-        context_(context),
-        tile_size_(tile_size)
+    const std::shared_ptr<OpenCLCommandQueue> &command_queue,
+    int tile_size) :
+    context_(context),
+    command_queue_(command_queue),
+    tile_size_(tile_size)
 {
     cl_int err;
     mem_ = clCreateBuffer(
@@ -41,13 +43,13 @@ OpenCLMem::~OpenCLMem()
     }
 }
 
-std::vector<float> OpenCLMem::value(const cl_command_queue command_queue) const
+std::vector<float> OpenCLMem::pixels() const
 {
     std::vector<float> a;
     a.resize(4 * tile_size_ * tile_size_);
 
     clEnqueueReadBuffer(
-        command_queue,
+        command_queue_->get(),
         mem_,
         true,
         0,
@@ -58,15 +60,5 @@ std::vector<float> OpenCLMem::value(const cl_command_queue command_queue) const
         nullptr);
 
     return a;
-}
-
-const cl_mem &OpenCLMem::get() const
-{
-    return mem_;
-}
-
-int OpenCLMem::tile_size() const
-{
-    return tile_size_;
 }
 
