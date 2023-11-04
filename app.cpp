@@ -5,6 +5,7 @@
 #include <memory>
 #include <future>
 
+#include <json/json.h>
 #include <png++/png.hpp>
 
 #include "openclcommandqueue.hpp"
@@ -15,8 +16,6 @@
 #include "openclplatform.hpp"
 #include "openclprogram.hpp"
 #include "pngimagewriter.hpp"
-#include "projectconfig.hpp"
-#include "deviceconfig.hpp"
 
 #define LOG_MODULE_NAME ("App")
 #include "log.hpp"

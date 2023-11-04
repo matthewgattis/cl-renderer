@@ -19,6 +19,7 @@ vcpkg_add_dependencies(
     "libpng"
     "zstd"
     "pngpp"
+    "opencl"
     )
 
 find_path(PNGPP_INCLUDE_DIRS "png++/color.hpp")
@@ -39,8 +40,6 @@ set(${PROJECT_NAME}_source
     openclmem.cpp
     openclplatform.cpp
     openclprogram.cpp
-    deviceconfig.cpp
-    projectconfig.cpp
     )
 
 set(${PROJECT_NAME}_include
@@ -55,9 +54,6 @@ set(${PROJECT_NAME}_include
     openclprogram.hpp
     serializable.hpp
     deserializable.hpp
-    jsonconfig.hpp
-    deviceconfig.hpp
-    projectconfig.hpp
     image.hpp
     )
 
