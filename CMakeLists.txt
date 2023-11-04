@@ -3,16 +3,9 @@ cmake_minimum_required(VERSION 3.16.3)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR};${CMAKE_MODULE_PATH};")
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
-include(vcpkgdependencies.cmake)
-set(VCPKG_ROOT ${CMAKE_BINARY_DIR}/vcpkg)
-if (DEFINED ENV{VCPKG_ROOT})
-    set(VCPKG_ROOT "$ENV{VCPKG_ROOT}")
-endif()
-set(CMAKE_TOOLCHAIN_FILE ${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake)
-vcpkg_install()
-
 project(cl-renderer VERSION 0.1.0)
 
+include(vcpkgdependencies.cmake)
 vcpkg_add_dependencies(
     "boolinq"
     "jsoncpp"
