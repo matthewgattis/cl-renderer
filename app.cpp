@@ -4,6 +4,8 @@
 #include <fstream>
 #include <memory>
 #include <future>
+#include <thread>
+#include <chrono>
 
 #include <json/json.h>
 #include <png++/png.hpp>
