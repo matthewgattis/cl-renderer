@@ -29,7 +29,7 @@ $ cmake --build .
 ```
 
 ### Render Test Image
-- In the build folder run `project.py` python script to generate a new `device.json` and `project.json`.
+- In the build folder run `project.py` python script to generate a new `device.json` and `project.json`. Or copy from the projects folder.
 - `device.json`
 ```json
 {
