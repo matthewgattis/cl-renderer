@@ -13,6 +13,7 @@ project = {
     'tile_size': 128,
     'samples': 64
 }
+
 device = {
     'platform': 'NVIDIA CUDA',
     'device': 'Quadro RTX 3000'
