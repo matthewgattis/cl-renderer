@@ -21,8 +21,8 @@ This is a, very much, work in progress project.
 
 ### Building
 ```
-$ clone https://github.com/matthewgattis/cl-renderer.git
-$ mkdir cl-renderer/build
+$ git clone https://github.com/matthewgattis/cl-renderer.git
+$ mkdir -p cl-renderer/build
 $ cd cl-renderer/build
 $ cmake -D CMAKE_BUILD_TYPE=Release ../
 $ cmake --build .
