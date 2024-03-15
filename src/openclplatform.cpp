@@ -48,6 +48,9 @@ OpenCLPlatform::OpenCLPlatform(
     platform_ = boolinq::from(platforms)
         .first([&platform_name](const cl_platform_id &x)
             {
+                if (platform_name.length() == 0)
+                    return true;
+
                 cl_int err;
                 char param_value[32767];
                 size_t  param_value_size_ret;

@@ -9,6 +9,7 @@
 
 #include <json/json.h>
 #include <png++/png.hpp>
+#include <argparse/argparse.hpp>
 
 #include "openclcommandqueue.hpp"
 #include "openclcontext.hpp"
@@ -17,7 +18,6 @@
 #include "openclmem.hpp"
 #include "openclplatform.hpp"
 #include "openclprogram.hpp"
-#include "pngimagewriter.hpp"
 
 #define LOG_MODULE_NAME ("App")
 #include "log.hpp"
@@ -53,26 +53,63 @@ std::future<T> &wait_for_any(const std::vector<std::future<T>>& fs)
 
 void App::run(const std::vector<std::string> &args)
 {
-    Json::Value project_config;
-    {
-        std::ifstream ifs("project.json");
-        ifs >> project_config;
-    }
+    argparse::ArgumentParser argument_parser("cl-renderer", "cl-renderer v0.1.0");
 
-    Json::Value device_config;
-    {
-        std::ifstream ifs("device.json");
-        ifs >> device_config;
-    }
+    argument_parser.add_argument("-k", "--kernel")
+        .help("name of kernel entry point")
+        .default_value(std::string("mainimage"));
 
-    const std::string program_name = project_config["program"].asString();
-    const std::string kernel_name = project_config["kernel"].asString();
-    const int image_count = project_config["image_count"].asInt();
-    const std::string output = project_config["output"].asString();
-    const int width = project_config["width"].asInt();
-    const int height = project_config["height"].asInt();
-    const int tile_size = project_config["tile_size"].asInt();
-    const int samples = project_config["samples"].asInt();
+    argument_parser.add_argument("-c", "--image-count")
+        .help("number of image frames to generate")
+        .default_value(1)
+        .scan<'i', int>();
+
+    argument_parser.add_argument("-o", "--output")
+        .help("output file name(s)")
+        .default_value(std::string("frame-%02d.png"));
+
+    argument_parser.add_argument("-w", "--width")
+        .help("image(s) width")
+        .default_value(960)
+        .scan<'i', int>();
+
+    argument_parser.add_argument("-h", "--height")
+        .help("image(s) height")
+        .default_value(640)
+        .scan<'i', int>();
+
+    argument_parser.add_argument("-t", "--tile-size")
+        .help("tile, or chunk, size to use when splitting up the image")
+        .default_value(128)
+        .scan<'i', int>();
+
+    argument_parser.add_argument("-s", "--samples")
+        .help("number of sample to run  for each pixel")
+        .default_value(64)
+        .scan<'i', int>();
+
+    argument_parser.add_argument("-p", "--platform")
+        .help("name OpenCL platform to use")
+        .default_value(std::string(""));
+
+    argument_parser.add_argument("-d", "--device")
+        .help("name of OpenCL device to use")
+        .default_value(std::string(""));
+
+    argument_parser.add_argument("program")
+        .help("file name of OpenCL program to load")
+        .default_value(std::string("program.cl"));
+
+    argument_parser.parse_args(args);
+    
+    const std::string program_name = argument_parser.get<std::string>("program");
+    const std::string kernel_name = argument_parser.get<std::string>("-k");
+    const int image_count = argument_parser.get<int>("-c");
+    const std::string output = argument_parser.get<std::string>("-o");
+    const int width = argument_parser.get<int>("-w");
+    const int height = argument_parser.get<int>("-h");
+    const int tile_size = argument_parser.get<int>("-t");
+    const int samples = argument_parser.get<int>("-s");
 
     const int tile_x_count = width / tile_size + ((width % tile_size) > 0 ? 1 : 0);
     const int tile_y_count = height / tile_size + ((height % tile_size) > 0 ? 1 : 0);
@@ -91,8 +128,11 @@ void App::run(const std::vector<std::string> &args)
     LOG_INFO << "tile_y_count (" << tile_y_count << ")" << std::endl;
     LOG_INFO << "tiles_total (" << tiles_total << ")" << std::endl;
 
-    auto platform = std::make_shared<OpenCLPlatform>(device_config["platform"].asString());
-    auto device = std::make_shared<OpenCLDevice>(platform, device_config["device"].asString());
+    const std::string platform_name = argument_parser.get<std::string>("-p");
+    const std::string device_name = argument_parser.get<std::string>("-d");
+
+    auto platform = std::make_shared<OpenCLPlatform>(platform_name);
+    auto device = std::make_shared<OpenCLDevice>(platform, device_name);
     auto context = std::make_shared<OpenCLContext>(device);
     std::shared_ptr<OpenCLProgram> program;
     {
