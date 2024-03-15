@@ -55,6 +55,9 @@ OpenCLDevice::OpenCLDevice(
     device_ = boolinq::from(devices)
         .first([&device_name](const cl_device_id &x) -> bool
             {
+                if (device_name.length() == 0)
+                    return true;
+
                 cl_int err;
                 char param_value[1024];
                 size_t param_value_size_ret;
@@ -125,7 +128,7 @@ OpenCLDevice::OpenCLDevice(
         std::make_pair(CL_DEVICE_PROFILE, "profile"),
         std::make_pair(CL_DEVICE_VERSION, "version"),
         //std::make_pair(CL_DEVICE_OPENCL_C_VERSION, "opencl c version"),
-        std::make_pair(CL_DEVICE_EXTENSIONS, "extensions")
+        //std::make_pair(CL_DEVICE_EXTENSIONS, "extensions")
     };
 
     try
