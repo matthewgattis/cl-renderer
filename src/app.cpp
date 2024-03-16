@@ -64,6 +64,11 @@ void App::run(const std::vector<std::string> &args)
         .default_value(1)
         .scan<'i', int>();
 
+    argument_parser.add_argument("--start-frame")
+        .help("number of frames to skip")
+        .default_value(0)
+        .scan<'i', int>();
+
     argument_parser.add_argument("-o", "--output")
         .help("output file name(s)")
         .default_value(std::string("frame-%04d.png"));
@@ -105,6 +110,7 @@ void App::run(const std::vector<std::string> &args)
     const std::string program_name = argument_parser.get<std::string>("program");
     const std::string kernel_name = argument_parser.get<std::string>("-k");
     const int image_count = argument_parser.get<int>("-c");
+    const int start_frame = argument_parser.get<int>("--start_frame");
     const std::string output = argument_parser.get<std::string>("-o");
     const int width = argument_parser.get<int>("-w");
     const int height = argument_parser.get<int>("-h");
@@ -145,7 +151,7 @@ void App::run(const std::vector<std::string> &args)
 
     cl_int err;
 
-    for (int i = 0; i < image_count; i++)
+    for (int i = start_frame; i < image_count; i++)
     {
         kernel->setFrameNumber(i);
 
