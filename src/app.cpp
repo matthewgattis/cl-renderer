@@ -66,7 +66,7 @@ void App::run(const std::vector<std::string> &args)
 
     argument_parser.add_argument("-o", "--output")
         .help("output file name(s)")
-        .default_value(std::string("frame-%02d.png"));
+        .default_value(std::string("frame-%04d.png"));
 
     argument_parser.add_argument("-w", "--width")
         .help("image(s) width")
@@ -143,75 +143,68 @@ void App::run(const std::vector<std::string> &args)
     auto mem = std::make_shared<OpenCLMem>(context, command_queue, tile_size);
     auto kernel = std::make_shared<OpenCLKernel>(program, kernel_name, mem, width, height);
 
-    png::image<png::rgb_pixel> image(width, height);
-
     cl_int err;
 
-    for (int x = 0; x < tile_x_count; x++)
+    for (int i = 0; i < image_count; i++)
     {
-        size_t global_work_size[3];
-        global_work_size[2] = 1;
+        kernel->setFrameNumber(i);
 
-        for (int y = 0; y < tile_y_count; y++)
+        png::image<png::rgb_pixel> image(width, height);
+
+        for (int x = 0; x < tile_x_count; x++)
         {
-            global_work_size[0] = min<int>(width - x * tile_size, tile_size);
-            global_work_size[1] = min<int>(height - y * tile_size, tile_size);
+            size_t global_work_size[3];
+            global_work_size[2] = 1;
 
-            size_t global_work_offset[3];
-            global_work_offset[0] = x * tile_size;
-            global_work_offset[1] = y * tile_size;
-
-            LOG_INFO <<
-                "Enqueuing tile (" << x << " " << y << ") sample (" << samples << ")." << std::endl;
-
-            for (int z = 0; z < samples; z++)
+            for (int y = 0; y < tile_y_count; y++)
             {
-                global_work_offset[2] = z;
+                global_work_size[0] = min<int>(width - x * tile_size, tile_size);
+                global_work_size[1] = min<int>(height - y * tile_size, tile_size);
 
-                err = clEnqueueNDRangeKernel(
-                    command_queue->get(),
-                    kernel->get(),
-                    3,
-                    global_work_offset,
-                    global_work_size,
-                    nullptr,
-                    0,
-                    nullptr,
-                    nullptr);
-                if (err != CL_SUCCESS)
+                size_t global_work_offset[3];
+                global_work_offset[0] = x * tile_size;
+                global_work_offset[1] = y * tile_size;
+
+                LOG_INFO <<
+                    "Enqueuing tile (" << x << " " << y << ") sample (" << samples << ")." << std::endl;
+
+                for (int z = 0; z < samples; z++)
                 {
-                    LOG_ERROR <<
-                        "Error in clEnqueueNDRangeKernel. (" << err << ")" << std::endl;
-                    throw std::exception();
+                    global_work_offset[2] = z;
+
+                    kernel->enqueueKernel(
+                        command_queue,
+                        global_work_offset,
+                        global_work_size);
                 }
-            }
 
-            command_queue->finish();
-            std::vector<float> tile = mem->pixels();
+                command_queue->finish();
+                std::vector<float> tile = mem->pixels();
 
-            for (int j = 0; j < (int)global_work_size[1]; j++)
-            {
-                for (int i = 0; i < (int)global_work_size[0]; i++)
+                for (int j = 0; j < (int)global_work_size[1]; j++)
                 {
-                    int k = x * tile_size + i;
-                    int l = y * tile_size + j;
-                    float r = min<float>(max(0.0f, tile[4 * (i + tile_size * j) + 0] * 255.0f), 255.0f);
-                    float g = min<float>(max(0.0f, tile[4 * (i + tile_size * j) + 1] * 255.0f), 255.0f);
-                    float b = min<float>(max(0.0f, tile[4 * (i + tile_size * j) + 2] * 255.0f), 255.0f);
-                    image[height - l - 1][k] = png::rgb_pixel(r, g, b);
+                    for (int i = 0; i < (int)global_work_size[0]; i++)
+                    {
+                        int k = x * tile_size + i;
+                        int l = y * tile_size + j;
+                        float r = min<float>(max(0.0f, tile[4 * (i + tile_size * j) + 0] * 255.0f), 255.0f);
+                        float g = min<float>(max(0.0f, tile[4 * (i + tile_size * j) + 1] * 255.0f), 255.0f);
+                        float b = min<float>(max(0.0f, tile[4 * (i + tile_size * j) + 2] * 255.0f), 255.0f);
+                        image[height - l - 1][k] = png::rgb_pixel(r, g, b);
+                    }
                 }
             }
         }
-    }
 
-    command_queue->finish();
+        command_queue->finish();
 
-    {
-        char* filename = new char[32768];
-        std::sprintf(filename, output.c_str(), 1);
-        LOG_INFO << "png++ image write (" << filename << ")." << std::endl;
-        image.write(filename);
-        delete[] filename;
+        {
+            char* filename = new char[32768];
+            std::sprintf(filename, output.c_str(), i);
+            LOG_INFO << "png++ image write (" << filename << ")." << std::endl;
+            image.write(filename);
+            delete[] filename;
+        }
     }
 }
 

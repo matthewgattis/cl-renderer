@@ -99,6 +99,7 @@ float sphere(float3 p, float r)
 
 // ------------------------------------------------------------------------------------------------
 // http://www.fractalforums.com/sierpinski-gasket/kaleidoscopic-(escape-time-ifs)/
+/*
 #define DE2_SCALE   (3.1f)
 #define DE2_OFFSET  ((float3)(1.0f, 1.0f, 1.0f))
 #define DE2_ITER    (48)
@@ -143,12 +144,12 @@ float DE2(float3 z, float *orbit)
     *orbit = min_dist;
     return d * pow(DE2_SCALE, -(float)DE2_ITER);
 }
+*/
 
 // ------------------------------------------------------------------------------------------------
 // http://www.fractalforums.com/sierpinski-gasket/kaleidoscopic-(escape-time-ifs)/
-/*
-#define DE2_SCALE   (1.5f)
-#define DE2_OFFSET  (2.0f)
+#define DE2_SCALE   (1.8f)
+#define DE2_OFFSET  (1.0f)
 #define DE2_ITER    (48)
 float DE2(float3 z, float *orbit)
 {
@@ -157,13 +158,19 @@ float DE2(float3 z, float *orbit)
 
     float min_dist = 1e9f;
 
+    const float rotate = M_PI / 2.0;
+    z = vRotateZ(z, rotate);
+
     for (int n = 0; n < DE2_ITER; n++)
     {
-        z = vRotateX(z, -M_PI * 0.25f);
+        z = vRotateX(z, rotate);
+        z = vRotateY(z, rotate);
+        z = vRotateZ(z, rotate);
+
+        z.xy = fabs(z.xy);
         if (z.x + z.y < 0.0f) { z.xy = -z.yx; } // fold 1
         if (z.x + z.z < 0.0f) { z.xz = -z.zx; } // fold 2
         if (z.y + z.z < 0.0f) { z.zy = -z.yz; } // fold 3  
-        //z.xyz = fabs(z.xyz);
         z = z * DE2_SCALE - DE2_OFFSET * (DE2_SCALE - 1.0f);
 
         d = length(z);
@@ -173,7 +180,6 @@ float DE2(float3 z, float *orbit)
     *orbit = min_dist;
     return d * pow(DE2_SCALE, -(float)DE2_ITER);
 }
-*/
 
 // ------------------------------------------------------------------------------------------------
 #define DE3_ITER            (32)

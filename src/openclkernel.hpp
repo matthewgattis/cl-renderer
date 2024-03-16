@@ -8,6 +8,7 @@
 
 class OpenCLMem;
 class OpenCLProgram;
+class OpenCLCommandQueue;
 
 class OpenCLKernel
 {
@@ -18,6 +19,13 @@ public:
         const std::shared_ptr<OpenCLMem> &mem,
         int width,
         int height);
+
+    void setFrameNumber(int frame);
+
+    void enqueueKernel(
+        const std::shared_ptr<OpenCLCommandQueue>& command_queue,
+        const size_t* global_work_offset,
+        const size_t* global_work_size);
 
     ~OpenCLKernel();
 

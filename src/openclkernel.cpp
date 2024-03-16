@@ -5,6 +5,7 @@
 
 #include "openclmem.hpp"
 #include "openclprogram.hpp"
+#include "openclcommandqueue.hpp"
 
 #define LOG_MODULE_NAME ("OpenCLKernel")
 #include "log.hpp"
@@ -96,6 +97,46 @@ OpenCLKernel::~OpenCLKernel()
         // Free kernel.
         clReleaseKernel(kernel_);
         LOG_INFO << "Kernel released." << std::endl;
+    }
+}
+
+void OpenCLKernel::setFrameNumber(int frame)
+{
+    cl_int arg_value = frame;
+    cl_int err = clSetKernelArg(
+        kernel_,
+        4,
+        sizeof (cl_int),
+        &arg_value);
+    if (err != CL_SUCCESS)
+    {
+        LOG_ERROR <<
+            "Error in clSetKernelArg. (" << err << ")" << std::endl;
+        throw std::exception();
+    }
+    LOG_INFO << "Set frame. (" << arg_value << ")" << std::endl;
+}
+
+void OpenCLKernel::enqueueKernel(
+    const std::shared_ptr<OpenCLCommandQueue>& command_queue,
+    const size_t* global_work_offset,
+    const size_t* global_work_size)
+{
+    cl_int err = clEnqueueNDRangeKernel(
+        command_queue->get(),
+        kernel_,
+        3,
+        global_work_offset,
+        global_work_size,
+        nullptr,
+        0,
+        nullptr,
+        nullptr);
+    if (err != CL_SUCCESS)
+    {
+        LOG_ERROR <<
+            "Error in clEnqueueNDRangeKernel. (" << err << ")" << std::endl;
+        throw std::exception();
     }
 }
 
