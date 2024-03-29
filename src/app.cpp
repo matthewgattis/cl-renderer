@@ -7,7 +7,6 @@
 #include <thread>
 #include <chrono>
 
-#include <json/json.h>
 #include <png++/png.hpp>
 #include <argparse/argparse.hpp>
 
@@ -110,7 +109,7 @@ void App::run(const std::vector<std::string> &args)
     const std::string program_name = argument_parser.get<std::string>("program");
     const std::string kernel_name = argument_parser.get<std::string>("-k");
     const int image_count = argument_parser.get<int>("-c");
-    const int start_frame = argument_parser.get<int>("--start_frame");
+    const int start_frame = argument_parser.get<int>("--start-frame");
     const std::string output = argument_parser.get<std::string>("-o");
     const int width = argument_parser.get<int>("-w");
     const int height = argument_parser.get<int>("-h");
