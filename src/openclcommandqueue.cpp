@@ -13,11 +13,21 @@ OpenCLCommandQueue::OpenCLCommandQueue(
 {
     cl_int err;
     // Create command queue.
+#if defined(__APPLE__)
+    cl_command_queue_properties properties = { };
+
+    command_queue_ = clCreateCommandQueue(
+        context->get(),
+        device->get(),
+        properties,
+        &err);
+#else
     command_queue_ = clCreateCommandQueueWithProperties(
         context->get(),
         device->get(),
         nullptr,
         &err);
+#endif
     if (err != CL_SUCCESS)
     {
         LOG_ERROR <<

@@ -1,6 +1,6 @@
 #define MAX_DISTANCE        (16.0f)
-#define MIN_DELTA           (0.000001f)
-#define MAX_REFLECTIONS     (16)
+#define MIN_DELTA           (0.00002f)
+#define MAX_REFLECTIONS     (8)
 
 #ifndef M_PI
 #define M_PI                (3.1415926535897932384626433832795f)
@@ -102,7 +102,7 @@ float sphere(float3 p, float r)
 /*
 #define DE2_SCALE   (3.1f)
 #define DE2_OFFSET  ((float3)(1.0f, 1.0f, 1.0f))
-#define DE2_ITER    (48)
+#define DE2_ITER    (32)
 float DE2(float3 z, float *orbit)
 {
     float r;
@@ -153,13 +153,10 @@ float DE2(float3 z, float *orbit)
 #define DE2_ITER    (48)
 float DE2(float3 z, float *orbit)
 {
-    float r;
     float d;
-
     float min_dist = 1e9f;
 
     const float rotate = M_PI / 2.0;
-    z = vRotateZ(z, rotate);
 
     for (int n = 0; n < DE2_ITER; n++)
     {
@@ -178,11 +175,12 @@ float DE2(float3 z, float *orbit)
     }
 
     *orbit = min_dist;
-    return d * pow(DE2_SCALE, -(float)DE2_ITER);
+    return d * pow(DE2_SCALE, -(float)(DE2_ITER));
 }
 
 // ------------------------------------------------------------------------------------------------
-#define DE3_ITER            (32)
+/*
+#define DE3_ITER            (40)
 #define DE3_SCALE           (2.0f)
 #define DE3_MIN_RADIUS      (0.5f)
 #define DE3_FIXED_RADIUS    (1.0f)
@@ -234,8 +232,31 @@ float DE3(float3 z, float *orbit)
     float r = length(z);
     return r / fabs(dr);
 }
+*/
 
 // ------------------------------------------------------------------------------------------------
+// domain repetition - 2008, 2013, 2023
+// Inigo Quilez
+// https://iquilezles.org/articles/sdfrepetition/
+// p, input position
+// s, scale/size
+// returns, distance to surface
+float repeated( float3 p, float s )
+{
+    float id = floor(p.z/s + 0.5f);
+    float  o = sign(p.z-s*id); // neighbor offset direction
+
+    float d = 1e20f;
+    for( int i=0; i<2; i++ )
+    {
+        float rid = id + (float)(i)*o;
+        float3 r = (float3)(p.x, p.y, p.z - s*rid);
+        float orbit;
+        d = min( d, DE2(r, &orbit) );
+    }
+    return d;
+}
+
 float getMap(float3 p, struct surface_feature *surf)
 {
     float t;
@@ -243,6 +264,7 @@ float getMap(float3 p, struct surface_feature *surf)
 
     surf->obj = 1;
     t = DE2(p, &(surf->orbit));
+    //t = repeated(p, 2.0f);
 
     return t;
 }
@@ -289,8 +311,9 @@ float castRay(float3 o, float3 d, struct surface_feature *surf)
 
 float3 getBackground(float3 d)
 {
-    //return (float3)(1.0f, 1.0f, 1.0f);
-    return (float3)(0.8f, 0.9f, 1.0f);
+    return (float3)(1.0f, 1.0f, 1.0f);
+    //return (float3)(0.8f, 0.9f, 1.0f);
+    //return (float3)(0.0f, 0.0f, 0.0f);
     //return -d / 2.0f + 0.5f;
 }
 
@@ -310,23 +333,39 @@ float3 pal(float t, float3 a, float3 b, float3 c, float3 d )
     return a + b*cos(TWO_PI * (c * t + d));
 }
 
+float3 multiplyVector(float4 *m, float3 d)
+{
+    float3 r;
+    for (int i = 0; i < 3; i++)
+        r[i] = dot((float3)(m[0][i], m[1][i], m[2][i]), d);
+
+    return r;
+}
+
 // ------------------------------------------------------------------------------------------------
-float4 drawScene(float2 p, float2 *seed)
+float4 drawScene(float2 p, float2 *seed, float time)
 {
     struct surface_feature surf[MAX_REFLECTIONS];
     struct surface_feature surf_shad;
 
-    float3 o = (float3)(-0.6f, -0.5f, 1.2f);
-    float3 d = (float3)(p.x, p.y, -2.0f);
-    float3 q = (float3)(0.0f, 0.0f, -2.0f);
+    //time += 1.0 / 48.0 * rand2n(seed).x;
 
-    d = vRotateY(d, 0.4f);
-    d = vRotateX(d, -0.6f);
+    float4 view[4] =
+    {
+        { 0.854345, -0.445309, 0.267925, 0 },
+        { -0.0542072, 0.436374, 0.898127, 0 },
+        { -0.516864, -0.781839, 0.348676, 0 },
+        { -0.0234757, 0.101048, 0.031702, 1 }
+    };
+
+    float3 o = 2.5f * view[3].xyz;
+    float3 d = (float3)(p.x, p.y, -2.0f);
+    d = normalize(multiplyVector(view, d));
 
     //*seed = *seed + (float2)(8436.4156f, 7864.1684f);
-    focus(0.1525f, 0.00001f, &o, &d, seed);
+    //focus(0.1525f, 0.00001f, &o, &d, seed);
 
-    const float3 light_vec = normalize((float3)(2.0f, 1.0f, 3.0f));
+    const float3 light_vec = normalize((float3)(1.0f, 3.0f, 2.0f));
 
     int j = 0;
     for (int i = 0; i < MAX_REFLECTIONS; i++)
@@ -360,10 +399,11 @@ float4 drawScene(float2 p, float2 *seed)
         switch (surf[j].obj)
         {
             case 0:
-                comp = getBackground(d);
+                comp = getBackground(d) * 2.0f * rand2n(seed).x;
                 break;
             case 1:
                 {
+                    /*
                     float3 color = 0.8f * pal(
                         log(surf[j].orbit),
                         (float3)(0.5f, 0.5f, 0.5f),
@@ -371,12 +411,15 @@ float4 drawScene(float2 p, float2 *seed)
                         (float3)(1.0f, 0.7f, 0.4f),
                         (float3)(0.0f, 0.15f, 0.20f));
                     color = mix(color, (float3)(1.0f, 1.0f, 1.0f), 1.0f / 32.0f);
+                    */
+                    float3 color = (float3)(1.0, 1.0, 1.0);
 
                     comp *= 0.6f * color;
 
                     if (surf[j].obj_shad == 0)
                     {
-                        comp += 6.0f * (float3)(1.0f, 0.8f, 0.6f) * color * max(0.0f, dot(surf[j].n, light_vec));
+                        comp += 8.0f * (float3)(1.0f, 1.0f, 1.0f) * color * max(0.0f, dot(surf[j].n, light_vec));
+                        //comp += 8.0f * (float3)(1.0f, 0.8f, 0.6f) * color * max(0.0f, dot(surf[j].n, light_vec));
                     }
                     break;
                 }
@@ -403,15 +446,17 @@ __kernel void mainimage(
 
     float2 resolution = (float2)(width, height);
 
+    float time = (float)frame / 24.0;
+
     float adjusted_sample = gid_z + 1.0f;
     float2 graph = (float2)(gid_x, gid_y);
     float2 seed =
-        (graph + (float2)(4118.4898f, 2304.2126f)) * adjusted_sample * 2763.8911f;
+        (graph + (float2)(4118.4898f, 2304.2126f)) * adjusted_sample * 2763.8911f * 1.2256f * (time + 1.0f);
     float2 offset = fabs(rand2n(&seed));
     graph = 2.0f * (graph + offset) / resolution.y;
     graph -= (float2)(resolution.x / resolution.y, 1.0f);
 
-    float4 final = drawScene(graph, &seed);
+    float4 final = drawScene(graph, &seed, time);
     final = pow(final, (float4)(1.0f / 2.2f));
 
     //return;
