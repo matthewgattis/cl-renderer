@@ -3,7 +3,7 @@
 #include <memory>
 
 #define CL_TARGET_OPENCL_VERSION 300
-#include <CL/cl.h>
+#include <OpenCL/cl.h>
 
 #include "opencldevice.hpp"
 

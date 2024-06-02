@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include <CL/cl.h>
+#include <OpenCL/cl.h>
 
 #include "openclcontext.hpp"
 #include "opencldevice.hpp"

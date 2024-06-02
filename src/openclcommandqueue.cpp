@@ -11,12 +11,14 @@ OpenCLCommandQueue::OpenCLCommandQueue(
     const std::shared_ptr<OpenCLDevice> &device)
     : command_queue_(nullptr)
 {
+    cl_command_queue_properties properties = { };
+
     cl_int err;
     // Create command queue.
-    command_queue_ = clCreateCommandQueueWithProperties(
+    command_queue_ = clCreateCommandQueue(
         context->get(),
         device->get(),
-        nullptr,
+        properties,
         &err);
     if (err != CL_SUCCESS)
     {

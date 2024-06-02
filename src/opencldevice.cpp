@@ -1,6 +1,6 @@
 #include "opencldevice.hpp"
 
-#include <CL/cl.h>
+#include <OpenCL/cl.h>
 #include <memory>
 #include <vector>
 

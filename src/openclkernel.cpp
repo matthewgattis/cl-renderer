@@ -1,6 +1,6 @@
 #include "openclkernel.hpp"
 
-#include <CL/cl.h>
+#include <OpenCL/cl.h>
 #include <memory>
 
 #include "openclmem.hpp"

@@ -1,7 +1,7 @@
 #include "openclmem.hpp"
 
 #define CL_TARGET_OPENCL_VERSION 300
-#include <CL/cl.h>
+#include <OpenCL/cl.h>
 
 #include "openclcontext.hpp"
 #include "openclcommandqueue.hpp"

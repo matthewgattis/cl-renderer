@@ -6,7 +6,7 @@
 #include <vector>
 
 #include <boolinq/boolinq.h>
-#include <CL/cl.h>
+#include <OpenCL/cl.h>
 
 #define LOG_MODULE_NAME ("OpenCLPlatform")
 #include "log.hpp"

@@ -3,7 +3,6 @@
   "dependencies": [
     "boolinq",
     "libpng",
-    "opencl",
     "pngpp",
     "argparse"
   ]

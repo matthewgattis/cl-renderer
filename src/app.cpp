@@ -36,20 +36,6 @@ inline float max(float a, float b)
     return a > b ? a : b;
 }
 
-template <typename T>
-std::future<T> &wait_for_any(const std::vector<std::future<T>>& fs)
-{
-    while (true)
-    {
-        for (auto& f : fs)
-        {
-            if (f.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
-                return &f;
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    }
-}
-
 void App::run(const std::vector<std::string> &args)
 {
     argparse::ArgumentParser argument_parser("cl-renderer", "cl-renderer v0.1.0");
@@ -163,8 +149,8 @@ void App::run(const std::vector<std::string> &args)
 
             for (int y = 0; y < tile_y_count; y++)
             {
-                global_work_size[0] = min<int>(width - x * tile_size, tile_size);
-                global_work_size[1] = min<int>(height - y * tile_size, tile_size);
+                global_work_size[0] = std::min<int>(width - x * tile_size, tile_size);
+                global_work_size[1] = std::min<int>(height - y * tile_size, tile_size);
 
                 size_t global_work_offset[3];
                 global_work_offset[0] = x * tile_size;
