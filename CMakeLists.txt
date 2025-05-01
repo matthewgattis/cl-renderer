@@ -6,15 +6,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 include(vcpkg_setup_toolchain.cmake)
 vcpkg_setup_toolchain()
 
-#vcpkg_add_dependencies(
-    #"boolinq"
-    #"jsoncpp"
-    #"libpng"
-    #"zstd"
-    #"pngpp"
-    #"opencl"
-    #)
-
 project(cl-renderer VERSION 0.1.0)
 
 find_path(PNGPP_INCLUDE_DIRS "png++/color.hpp")
@@ -63,7 +54,7 @@ add_executable(${PROJECT_NAME}
 #    )
 
 target_include_directories(${PROJECT_NAME}
-    PRIVATE ${OpenCL_INCLUDE_DIRS}
+    PRIVATE ${OpenCL_INCLUDE_DIR}
     PRIVATE ${PNGPP_INCLUDE_DIRS}
     )
 

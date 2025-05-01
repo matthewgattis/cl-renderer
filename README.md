@@ -13,11 +13,11 @@ This is a, very much, work in progress project.
 ### Prequisites
 - CMake https://cmake.org/
 - OpenCL runtime.
-- vcpkg https://github.com/microsoft/vcpkg (optional)
-    - This will automatically be cloned and bootstrapped by this project's CMake configure step. Into the project's build folder.
-    - You can manually clone and bootstrap vcpkg yourself if you like.
-        - Use CMake argument `-D VCPKG_ROOT=<path to vcpkg root directory>`
-        - Or set the `VCPKG_ROOT` environment variable to vcpkg root directory.
+- vcpkg https://github.com/microsoft/vcpkg
+    - Manually clone and bootstrap vcpkg according to instructions.
+        - https://learn.microsoft.com/en-us/vcpkg/get_started/get-started?pivots=shell-cmd
+    - Set the `VCPKG_ROOT` environment variable to vcpkg root directory.
+    - Or use CMake argument `-D VCPKG_ROOT=<path to vcpkg root directory>`
 
 ### Building
 ```
@@ -29,33 +29,28 @@ $ cmake --build .
 ```
 
 ### Render Test Image
-- In the build folder run `project.py` python script to generate a new `device.json` and `project.json`. Or copy from the projects folder.
-- `device.json`
-```json
-{
-    "platform": "NVIDIA CUDA",
-    "device": "Quadro RTX 3000"
-}
-```
-- Use application like `clinfo` to identify platforms/devices available on your system.
-- `project.json`
-```json
-{
-    "program": "program.cl",                    // Name of CL program file to load.
-    "kernel": "mainimage",                      // Name of kernel entry point.
-    "image_count": 1,                           // Total number of images to generate.
-    "output": "frame_20231031_095855_%02d.png", // Name of output image.
-    "width": 1280,                              // Image width.
-    "height": 720,                              // Image height.
-    "tile_size": 128,                           // Size of image to work on at any time.
-    "samples": 64                               // Multi sample count.
-}
-```
-- Adjust options as desired.
-- The included `program.cl` will render the test image seen above. Copy it to the build folder as well.
-- Run `cl-renderer` in same folder as config files.
-```bash
-$ python ../project.py
-$ cp ../program.cl ./
-$ ./cl-rendrerer
+- Render the test image with default arguments:
+- `./cl-renderer --platform "NVIDIA CUDA" --device "Quadro TRX 3000" ../program.cl`
+- Use application like `clinfo` to find platform and device.
+- Default is to use first platform and first device.
+- Use `--help` for more options:
+``` text
+Usage: cl-renderer [-h] [--kernel VAR] [--image-count VAR] [--start-frame VAR] [--output VAR] [--width VAR] [-h] [--tile-size VAR] [--samples VAR] [--platform VAR] [--device VAR] program
+
+Positional arguments:
+  program          	file name of OpenCL program to load [default: "program.cl"]
+
+Optional arguments:
+  -h, --help       	shows help message and exits
+  -v, --version    	prints version information and exits
+  -k, --kernel     	name of kernel entry point [default: "mainimage"]
+  -c, --image-count	number of image frames to generate [default: 1]
+  --start-frame    	number of frames to skip [default: 0]
+  -o, --output     	output file name(s) [default: "frame-%04d.png"]
+  -w, --width      	image(s) width [default: 960]
+  -h, --height     	image(s) height [default: 640]
+  -t, --tile-size  	tile, or chunk, size to use when splitting up the image [default: 128]
+  -s, --samples    	number of sample to run  for each pixel [default: 64]
+  -p, --platform   	name OpenCL platform to use [default: ""]
+  -d, --device     	name of OpenCL device to use [default: ""]
 ```
