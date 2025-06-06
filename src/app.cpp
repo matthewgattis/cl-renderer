@@ -52,7 +52,7 @@ std::future<T> &wait_for_any(const std::vector<std::future<T>>& fs)
 
 void App::run(const std::vector<std::string> &args)
 {
-    argparse::ArgumentParser argument_parser("cl-renderer", "cl-renderer v0.1.0");
+    argparse::ArgumentParser argument_parser("cl-renderer", "cl-renderer v0.1.1");
 
     argument_parser.add_argument("-k", "--kernel")
         .help("name of kernel entry point")
@@ -83,7 +83,7 @@ void App::run(const std::vector<std::string> &args)
         .scan<'i', int>();
 
     argument_parser.add_argument("-t", "--tile-size")
-        .help("tile, or chunk, size to use when splitting up the image")
+        .help("tile, or chunk, size to use when splitting the image")
         .default_value(128)
         .scan<'i', int>();
 
@@ -107,14 +107,14 @@ void App::run(const std::vector<std::string> &args)
     argument_parser.parse_args(args);
     
     const std::string program_name = argument_parser.get<std::string>("program");
-    const std::string kernel_name = argument_parser.get<std::string>("-k");
-    const int image_count = argument_parser.get<int>("-c");
+    const std::string kernel_name = argument_parser.get<std::string>("--kernel");
+    const int image_count = argument_parser.get<int>("--image-count");
     const int start_frame = argument_parser.get<int>("--start-frame");
-    const std::string output = argument_parser.get<std::string>("-o");
-    const int width = argument_parser.get<int>("-w");
-    const int height = argument_parser.get<int>("-h");
-    const int tile_size = argument_parser.get<int>("-t");
-    const int samples = argument_parser.get<int>("-s");
+    const std::string output = argument_parser.get<std::string>("--output");
+    const int width = argument_parser.get<int>("--width");
+    const int height = argument_parser.get<int>("--height");
+    const int tile_size = argument_parser.get<int>("--tile-size");
+    const int samples = argument_parser.get<int>("--samples");
 
     const int tile_x_count = width / tile_size + ((width % tile_size) > 0 ? 1 : 0);
     const int tile_y_count = height / tile_size + ((height % tile_size) > 0 ? 1 : 0);
@@ -133,8 +133,8 @@ void App::run(const std::vector<std::string> &args)
     LOG_INFO << "tile_y_count (" << tile_y_count << ")" << std::endl;
     LOG_INFO << "tiles_total (" << tiles_total << ")" << std::endl;
 
-    const std::string platform_name = argument_parser.get<std::string>("-p");
-    const std::string device_name = argument_parser.get<std::string>("-d");
+    const std::string platform_name = argument_parser.get<std::string>("--platform");
+    const std::string device_name = argument_parser.get<std::string>("--device");
 
     auto platform = std::make_shared<OpenCLPlatform>(platform_name);
     auto device = std::make_shared<OpenCLDevice>(platform, device_name);

@@ -1,10 +1,10 @@
 {
   "name": "cl-renderer",
   "dependencies": [
+    "argparse",
     "boolinq",
     "libpng",
-    "opencl",
     "pngpp",
-    "argparse"
+    "opencl"
   ]
 }
