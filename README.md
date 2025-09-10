@@ -30,7 +30,7 @@ $ cmake --build .
 
 ### Render Test Image
 - Render the test image with default arguments:
-- `./cl-renderer --platform "NVIDIA CUDA" --device "Quadro TRX 3000" ../program.cl`
+- `./cl-renderer --platform "NVIDIA CUDA" --device "Quadro RTX 3000" ../program.cl`
 - Use application like `clinfo` to find platform and device.
 - Default is to use first platform and first device.
 - Use `--help` for more options:
